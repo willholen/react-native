@@ -12,6 +12,7 @@
 #include <fb/glog_init.h>
 #include <fb/log.h>
 #include <fbjni/fbjni.h>
+#include <folly/dynamic.h>
 
 #include "CatalystInstanceImpl.h"
 #include "CxxModuleWrapper.h"
@@ -66,8 +67,14 @@ class ProxyJavaScriptExecutorHolder : public HybridClass<
 } // namespace
 
 extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+  gloginit::initialize();
+  {
+    folly::dynamic test = folly::dynamic::object;
+    LOG(INFO) << "TEST This statement logs";
+    test["foo"] = "bar";
+    LOG(INFO) << "TEST This statement does not";
+  }
   return initialize(vm, [] {
-    gloginit::initialize();
     FLAGS_minloglevel = 0;
     ProxyJavaScriptExecutorHolder::registerNatives();
     CatalystInstanceImpl::registerNatives();
